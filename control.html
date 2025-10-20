@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chawner Halloween Automation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #1a1a1a 80%, #ff6f00 100%);
+      color: #fff;
+      font-family: 'Creepster', cursive, Arial, sans-serif;
+      text-align: center;
+      padding-top: 40px;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    h2 {
+      color: #ff9800;
+      font-size: 3em;
+      letter-spacing: 2px;
+      text-shadow: 2px 2px 8px #000, 0 0 20px #ff9800;
+      margin-bottom: 40px;
+    }
+    .device-section {
+      background: rgba(30, 30, 30, 0.85);
+      border: 2px solid #ff9800;
+      border-radius: 16px;
+      margin: 30px auto;
+      max-width: 400px;
+      padding: 24px 0 18px 0;
+      box-shadow: 0 0 24px #000, 0 0 8px #ff9800 inset;
+      position: relative;
+    }
+    .device-title {
+      font-size: 2em;
+      color: #43ff43;
+      margin-bottom: 18px;
+      text-shadow: 1px 1px 8px #000, 0 0 8px #43ff43;
+    }
+    .button-group {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 10px;
+    }
+    button {
+      background: #222;
+      color: #ff9800;
+      border: 3px solid #43ff43;
+      border-radius: 12px;
+      padding: 14px 28px;
+      font-size: 1.2em;
+      font-family: 'Creepster', cursive, Arial, sans-serif;
+      cursor: pointer;
+      box-shadow: 0 0 16px #000, 0 0 8px #43ff43 inset;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      text-shadow: 1px 1px 6px #000;
+    }
+    button:hover {
+      background: #ff9800;
+      color: #222;
+      box-shadow: 0 0 24px #ff9800, 0 0 12px #43ff43 inset;
+    }
+    .status {
+      margin-top: 10px;
+      font-size: 1.2em;
+      color: #43ff43;
+      text-shadow: 1px 1px 8px #000;
+      min-height: 2em;
+    }
+    .bat {
+      position: absolute;
+      width: 60px;
+      animation: fly 8s linear infinite;
+      opacity: 0.7;
+      z-index: 0;
+    }
+    .bat:nth-child(1) { top: 10%; left: -80px; animation-delay: 0s; }
+    .bat:nth-child(2) { top: 30%; left: -100px; animation-delay: 2s; }
+    .bat:nth-child(3) { top: 60%; left: -120px; animation-delay: 4s; }
+    @keyframes fly {
+      0% { left: -80px; transform: scaleX(1) rotate(-10deg);}
+      50% { left: 100vw; transform: scaleX(-1) rotate(10deg);}
+      100% { left: -80px; transform: scaleX(1) rotate(-10deg);}
+    }
+  </style>
+  <script>
+    function sendCommand(host, cmd, statusId) {
+      fetch(`http://${host}/action?cmd=${cmd}`)
+        .then(response => response.text())
+        .then(data => document.getElementById(statusId).innerText = data)
+        .catch(err => document.getElementById(statusId).innerText = 'Error: ' + err);
+    }
+  </script>
+</head>
+<body>
+  <!-- Animated bats -->
+  <img src="https://img.icons8.com/ios-filled/50/ff9800/bat.png" class="bat" style="top:10%;"/>
+  <img src="https://img.icons8.com/ios-filled/50/43ff43/bat.png" class="bat" style="top:30%;"/>
+  <img src="https://img.icons8.com/ios-filled/50/ffffff/bat.png" class="bat" style="top:60%;"/>
+  <h2>Chawner Halloween Automation</h2>
+
+  <div class="device-section">
+    <div class="device-title">Device 1</div>
+    <div class="button-group">
+      <button onclick="sendCommand('esp32-halloween1.local', 'on', 'status1')">On</button>
+      <button onclick="sendCommand('esp32-halloween1.local', 'off', 'status1')">Off</button>
+    </div>
+    <span class="status" id="status1"></span>
+  </div>
+  <div class="device-section">
+    <div class="device-title">Device 2</div>
+    <div class="button-group">
+      <button onclick="sendCommand('esp32-halloween2.local', 'on', 'status2')">On</button>
+      <button onclick="sendCommand('esp32-halloween2.local', 'off', 'status2')">Off</button>
+    </div>
+    <span class="status" id="status2"></span>
+  </div>
+  <div class="device-section">
+    <div class="device-title">Device 3</div>
+    <div class="button-group">
+      <button onclick="sendCommand('esp32-halloween3.local', 'on', 'status3')">On</button>
+      <button onclick="sendCommand('esp32-halloween3.local', 'off', 'status3')">Off</button>
+    </div>
+    <span class="status" id="status3"></span>
+  </div>
+</body>
+</html>
