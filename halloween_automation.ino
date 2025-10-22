@@ -2,6 +2,14 @@
 #include <WebServer.h>
 #include <ESPmDNS.h> // Add mDNS support
 
+/*
+platformio.ini settings:
+[env:esp32dev]
+platform = espressif32
+board = esp32dev
+framework = arduino
+*/
+
 const char* ssid = "Black_FBI_Van";
 const char* password = "dailylake789";
 
