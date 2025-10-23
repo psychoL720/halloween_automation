@@ -15,39 +15,53 @@ const char* password = "dailylake789";
 
 WebServer server(80);
 
-// Define RGBW LED pins (change as needed)
-const int RED_PIN   = 4;  // use 220 ohm resistors for each channel
-const int GREEN_PIN = 16; // use 220 ohm resistors for each channel
-const int BLUE_PIN  = 17; // use 220 ohm resistors for each channel
-const int WHITE_PIN = 18; // use 220 ohm resistors for each channel
-// If using common cathode, connect the common of the LED to GND
-// If using common anode, connect common pin to 3.3V and invert logic in code (set 0 = ON, 255 = OFF)
-// LED labeled either CC or CA possibly
-// Longest pin is the common pin
-// TO identify which you have:
-// 1. Connect common to GND, briefly touch each color pin to 3.3V through a 220 ohm resistor
-//    If the LED lights up, it's common cathode
-// 2. Connect common to 3.3V, briefly touch each color pin to GND through a 220 ohm resistor
-//    If the LED lights up, it's common anode
-const int LEDC_CHANNEL_R = 0;
-const int LEDC_CHANNEL_G = 1;
-const int LEDC_CHANNEL_B = 2;
-const int LEDC_CHANNEL_W = 3;
+// Define LED pins
+const int WHITE_PIN = 4;  // White LED pin
+const int RED_PIN   = 16; // Red LED pin  
+const int UV_PIN    = 17; // Ultraviolet LED pin
+
+const int LEDC_CHANNEL_WHITE = 0;
+const int LEDC_CHANNEL_RED = 1;
+const int LEDC_CHANNEL_UV = 2;
 const int LEDC_FREQ = 5000;
 const int LEDC_RES = 8; // 8-bit PWM
 
 const int ONBOARD_LED_PIN = 2; // Most ESP32 boards use GPIO2 for onboard LED
 
-void setRGBW(uint8_t r, uint8_t g, uint8_t b, uint8_t w) {
-  ledcWrite(LEDC_CHANNEL_R, r);
-  ledcWrite(LEDC_CHANNEL_G, g);
-  ledcWrite(LEDC_CHANNEL_B, b);
-  ledcWrite(LEDC_CHANNEL_W, w);
+// Current LED brightness values
+uint8_t whiteBrightness = 0;
+uint8_t redBrightness = 0;
+uint8_t uvBrightness = 0;
+
+void setLEDs(uint8_t white, uint8_t red, uint8_t uv) {
+  ledcWrite(LEDC_CHANNEL_WHITE, white);
+  ledcWrite(LEDC_CHANNEL_RED, red);
+  ledcWrite(LEDC_CHANNEL_UV, uv);
+  // Update current values
+  whiteBrightness = white;
+  redBrightness = red;
+  uvBrightness = uv;
+}
+
+void fadeOutAllLEDs() {
+  // Find the maximum current brightness to fade from
+  uint8_t maxBrightness = max(whiteBrightness, max(redBrightness, uvBrightness));
+  
+  for (int duty = maxBrightness; duty >= 0; duty--) {
+    uint8_t whiteVal = (whiteBrightness > 0) ? map(duty, 0, maxBrightness, 0, whiteBrightness) : 0;
+    uint8_t redVal = (redBrightness > 0) ? map(duty, 0, maxBrightness, 0, redBrightness) : 0;
+    uint8_t uvVal = (uvBrightness > 0) ? map(duty, 0, maxBrightness, 0, uvBrightness) : 0;
+    
+    setLEDs(whiteVal, redVal, uvVal);
+    delay(5);
+  }
+  setLEDs(0, 0, 0); // Ensure all are off
 }
 
 void handleAction() {
   String cmd = server.arg("cmd");
   server.sendHeader("Access-Control-Allow-Origin", "*");
+  
   if (cmd == "on") {
     digitalWrite(ONBOARD_LED_PIN, HIGH); // Turn ONBOARD LED ON
     server.send(200, "text/plain", "Onboard LED ON");
@@ -55,28 +69,22 @@ void handleAction() {
     digitalWrite(ONBOARD_LED_PIN, LOW); // Turn ONBOARD LED OFF
     server.send(200, "text/plain", "Onboard LED OFF");
   } else if (cmd == "fade") {
-    // Fade out all channels together
-    for (int duty = 255; duty >= 0; duty--) {
-      setRGBW(duty, duty, duty, duty);
-      delay(5); // Adjust for fade speed
-    }
-    server.send(200, "text/plain", "Faded out LED");
+    fadeOutAllLEDs();
+    server.send(200, "text/plain", "All LEDs faded out");
   } else if (cmd == "white") {
-    setRGBW(0, 0, 0, 255); // Only white channel at full brightness
-    server.send(200, "text/plain", "White full ON");
+    setLEDs(0, 0, 0); // Turn off all LEDs immediately
+    setLEDs(255, 0, 0); // Turn on white LED
+    server.send(200, "text/plain", "White LED ON");
   } else if (cmd == "red") {
-    // Fade out all channels together
-    for (int duty = 255; duty >= 0; duty--) {
-      setRGBW(duty, duty, duty, duty);
-      delay(5); // Adjust for fade speed
-    }
-    delay(300); // Brief pause (300 ms)
-    // Fade in red channel only
-    for (int duty = 0; duty <= 255; duty++) {
-      setRGBW(duty, 0, 0, 0);
-      delay(5); // Adjust for fade speed
-    }
-    server.send(200, "text/plain", "White OUT, faded in Red");
+    fadeOutAllLEDs(); // Fade out any LEDs that are on
+    delay(300); // Brief pause
+    setLEDs(0, 255, 0); // Turn on red LED
+    server.send(200, "text/plain", "Red LED ON");
+  } else if (cmd == "blue") {
+    fadeOutAllLEDs(); // Fade out any LEDs that are on
+    delay(300); // Brief pause
+    setLEDs(0, 0, 255); // Turn on UV LED
+    server.send(200, "text/plain", "UV LED ON");
   } else {
     server.send(400, "text/plain", "Unknown command");
   }
@@ -85,18 +93,16 @@ void handleAction() {
 void setup() {
   Serial.begin(115200);
 
-  // Setup PWM for each channel
-  ledcSetup(LEDC_CHANNEL_R, LEDC_FREQ, LEDC_RES);
-  ledcSetup(LEDC_CHANNEL_G, LEDC_FREQ, LEDC_RES);
-  ledcSetup(LEDC_CHANNEL_B, LEDC_FREQ, LEDC_RES);
-  ledcSetup(LEDC_CHANNEL_W, LEDC_FREQ, LEDC_RES);
+  // Setup PWM for each LED channel
+  ledcSetup(LEDC_CHANNEL_WHITE, LEDC_FREQ, LEDC_RES);
+  ledcSetup(LEDC_CHANNEL_RED, LEDC_FREQ, LEDC_RES);
+  ledcSetup(LEDC_CHANNEL_UV, LEDC_FREQ, LEDC_RES);
 
-  ledcAttachPin(RED_PIN,   LEDC_CHANNEL_R);
-  ledcAttachPin(GREEN_PIN, LEDC_CHANNEL_G);
-  ledcAttachPin(BLUE_PIN,  LEDC_CHANNEL_B);
-  ledcAttachPin(WHITE_PIN, LEDC_CHANNEL_W);
+  ledcAttachPin(WHITE_PIN, LEDC_CHANNEL_WHITE);
+  ledcAttachPin(RED_PIN, LEDC_CHANNEL_RED);
+  ledcAttachPin(UV_PIN, LEDC_CHANNEL_UV);
 
-  setRGBW(255, 255, 255, 255); // Start ON and white
+  setLEDs(0, 0, 0); // Start with all LEDs off
 
   pinMode(ONBOARD_LED_PIN, OUTPUT); // Initialize onboard LED
 

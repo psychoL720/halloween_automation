@@ -39,8 +39,9 @@
     .button-group {
       display: flex;
       flex-direction: row;
+      flex-wrap: wrap;
       justify-content: center;
-      gap: 24px;
+      gap: 18px;
       margin-bottom: 10px;
     }
     button {
@@ -67,6 +68,7 @@
       color: #43ff43;
       text-shadow: 1px 1px 8px #000;
       min-height: 2em;
+      display: block;
     }
     .bat {
       position: absolute;
@@ -103,8 +105,12 @@
   <div class="device-section">
     <div class="device-title">Device 1</div>
     <div class="button-group">
-      <button onclick="sendCommand('esp32-halloween1.local', 'on', 'status1')">On</button>
-      <button onclick="sendCommand('esp32-halloween1.local', 'off', 'status1')">Off</button>
+      <button onclick="sendCommand('esp32-halloween1.local', 'on', 'status1')">Test On</button>
+      <button onclick="sendCommand('esp32-halloween1.local', 'off', 'status1')">Test Off</button>
+      <button onclick="sendCommand('esp32-halloween1.local', 'fade', 'status1')">Fade Out</button>
+      <button onclick="sendCommand('esp32-halloween1.local', 'white', 'status1')">White On</button>
+      <button onclick="sendCommand('esp32-halloween1.local', 'red', 'status1')">Blue On</button>
+      <button onclick="sendCommand('esp32-halloween1.local', 'red', 'status1')">Red On</button>
     </div>
     <span class="status" id="status1"></span>
   </div>
