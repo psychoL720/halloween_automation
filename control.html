@@ -117,8 +117,11 @@
   <div class="device-section">
     <div class="device-title">Device 2</div>
     <div class="button-group">
-      <button onclick="sendCommand('esp32-halloween2.local', 'on', 'status2')">On</button>
-      <button onclick="sendCommand('esp32-halloween2.local', 'off', 'status2')">Off</button>
+      <button onclick="sendCommand('esp32-halloween2.local', 'on', 'status2')">Disabled On</button>
+      <button onclick="sendCommand('esp32-halloween2.local', 'off', 'status2')">Disabled Off</button>
+      <button onclick="sendCommand('esp32-halloween2.local', 'test', 'status2')">Testing Servo</button>
+      <button onclick="sendCommand('esp32-halloween2.local', 'smoke', 'status2')">Triggered smoke</button>
+      <button onclick="sendCommand('esp32-halloween2.local', 'scare', 'status2')">Triggered scare</button>
     </div>
     <span class="status" id="status2"></span>
   </div>

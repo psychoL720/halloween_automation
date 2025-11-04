@@ -16,9 +16,9 @@ const char* password = "dailylake789";
 WebServer server(80);
 
 // Define LED pins
-const int WHITE_PIN = 4;  // White LED pin
-const int RED_PIN   = 16; // Red LED pin  
-const int UV_PIN    = 17; // Ultraviolet LED pin
+const int WHITE_PIN = 18;  // White LED pin
+const int RED_PIN   = 19; // Red LED pin  
+const int UV_PIN    = 21; // Ultraviolet LED pin
 
 const int LEDC_CHANNEL_WHITE = 0;
 const int LEDC_CHANNEL_RED = 1;
@@ -53,7 +53,7 @@ void fadeOutAllLEDs() {
     uint8_t uvVal = (uvBrightness > 0) ? map(duty, 0, maxBrightness, 0, uvBrightness) : 0;
     
     setLEDs(whiteVal, redVal, uvVal);
-    delay(5);
+    delay(20);
   }
   setLEDs(0, 0, 0); // Ensure all are off
 }
