@@ -2,8 +2,18 @@
 <html>
 <head>
   <title>Chawner Halloween Automation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+    }
     body {
       background: linear-gradient(135deg, #1a1a1a 80%, #ff6f00 100%);
       color: #fff;
@@ -11,7 +21,7 @@
       text-align: center;
       padding-top: 40px;
       min-height: 100vh;
-      overflow-x: hidden;
+      position: relative;
     }
     h2 {
       color: #ff9800;
@@ -71,19 +81,45 @@
       display: block;
     }
     .bat {
-      position: absolute;
+      position: fixed;
       width: 60px;
-      animation: fly 8s linear infinite;
       opacity: 0.7;
-      z-index: 0;
+      z-index: -1;
+      pointer-events: none;
+      will-change: transform;
     }
-    .bat:nth-child(1) { top: 10%; left: -80px; animation-delay: 0s; }
-    .bat:nth-child(2) { top: 30%; left: -100px; animation-delay: 2s; }
-    .bat:nth-child(3) { top: 60%; left: -120px; animation-delay: 4s; }
-    @keyframes fly {
-      0% { left: -80px; transform: scaleX(1) rotate(-10deg);}
-      50% { left: 100vw; transform: scaleX(-1) rotate(10deg);}
-      100% { left: -80px; transform: scaleX(1) rotate(-10deg);}
+    .bat1 {
+      top: 10vh;
+      animation: flyBat1 8s linear infinite;
+    }
+    .bat2 {
+      top: 30vh;
+      animation: flyBat2 8s linear infinite 2s;
+    }
+    .bat3 {
+      top: 60vh;
+      animation: flyBat3 8s linear infinite 4s;
+    }
+    @keyframes flyBat1 {
+      0% { transform: translateX(-80px) scaleX(1) rotate(-10deg); }
+      49% { transform: translateX(calc(100vw - 20px)) scaleX(1) rotate(-10deg); }
+      50% { transform: translateX(calc(100vw - 20px)) scaleX(-1) rotate(10deg); }
+      99% { transform: translateX(-80px) scaleX(-1) rotate(10deg); }
+      100% { transform: translateX(-80px) scaleX(1) rotate(-10deg); }
+    }
+    @keyframes flyBat2 {
+      0% { transform: translateX(-80px) scaleX(1) rotate(-10deg); }
+      49% { transform: translateX(calc(100vw - 20px)) scaleX(1) rotate(-10deg); }
+      50% { transform: translateX(calc(100vw - 20px)) scaleX(-1) rotate(10deg); }
+      99% { transform: translateX(-80px) scaleX(-1) rotate(10deg); }
+      100% { transform: translateX(-80px) scaleX(1) rotate(-10deg); }
+    }
+    @keyframes flyBat3 {
+      0% { transform: translateX(-80px) scaleX(1) rotate(-10deg); }
+      49% { transform: translateX(calc(100vw - 20px)) scaleX(1) rotate(-10deg); }
+      50% { transform: translateX(calc(100vw - 20px)) scaleX(-1) rotate(10deg); }
+      99% { transform: translateX(-80px) scaleX(-1) rotate(10deg); }
+      100% { transform: translateX(-80px) scaleX(1) rotate(-10deg); }
     }
   </style>
   <script>
@@ -97,9 +133,9 @@
 </head>
 <body>
   <!-- Animated bats -->
-  <img src="https://img.icons8.com/ios-filled/50/ff9800/bat.png" class="bat" style="top:10%;"/>
-  <img src="https://img.icons8.com/ios-filled/50/43ff43/bat.png" class="bat" style="top:30%;"/>
-  <img src="https://img.icons8.com/ios-filled/50/ffffff/bat.png" class="bat" style="top:60%;"/>
+  <img src="https://img.icons8.com/ios-filled/50/ff9800/bat.png" class="bat bat1"/>
+  <img src="https://img.icons8.com/ios-filled/50/43ff43/bat.png" class="bat bat2"/>
+  <img src="https://img.icons8.com/ios-filled/50/ffffff/bat.png" class="bat bat3"/>
   <h2>Chawner Halloween Automation</h2>
 
   <div class="device-section">
@@ -107,29 +143,28 @@
     <div class="button-group">
       <button onclick="sendCommand('esp32-halloween1.local', 'on', 'status1')">Test On</button>
       <button onclick="sendCommand('esp32-halloween1.local', 'off', 'status1')">Test Off</button>
-      <button onclick="sendCommand('esp32-halloween1.local', 'fade', 'status1')">Fade Out</button>
-      <button onclick="sendCommand('esp32-halloween1.local', 'white', 'status1')">White On</button>
-      <button onclick="sendCommand('esp32-halloween1.local', 'red', 'status1')">Blue On</button>
-      <button onclick="sendCommand('esp32-halloween1.local', 'red', 'status1')">Red On</button>
+      <button onclick="sendCommand('esp32-halloween1.local', 'fade', 'status1')">Fade</button>
+      <button onclick="sendCommand('esp32-halloween1.local', 'white', 'status1')">White</button>
+      <button onclick="sendCommand('esp32-halloween1.local', 'red', 'status1')">Red</button>
+      <button onclick="sendCommand('esp32-halloween1.local', 'blue', 'status1')">UV</button>
     </div>
     <span class="status" id="status1"></span>
   </div>
   <div class="device-section">
     <div class="device-title">Device 2</div>
     <div class="button-group">
-      <button onclick="sendCommand('esp32-halloween2.local', 'on', 'status2')">Disabled On</button>
-      <button onclick="sendCommand('esp32-halloween2.local', 'off', 'status2')">Disabled Off</button>
-      <button onclick="sendCommand('esp32-halloween2.local', 'test', 'status2')">Testing Servo</button>
-      <button onclick="sendCommand('esp32-halloween2.local', 'smoke', 'status2')">Triggered smoke</button>
-      <button onclick="sendCommand('esp32-halloween2.local', 'scare', 'status2')">Triggered scare</button>
+      <button onclick="sendCommand('esp32-halloween2.local', 'on', 'status2')">Test On</button>
+      <button onclick="sendCommand('esp32-halloween2.local', 'off', 'status2')">Test Off</button>
+      <button onclick="sendCommand('esp32-halloween2.local', 'smoke', 'status2')">Smoke</button>
+      <button onclick="sendCommand('esp32-halloween2.local', 'scare', 'status2')">Scare</button>
     </div>
     <span class="status" id="status2"></span>
   </div>
   <div class="device-section">
     <div class="device-title">Device 3</div>
     <div class="button-group">
-      <button onclick="sendCommand('esp32-halloween3.local', 'on', 'status3')">On</button>
-      <button onclick="sendCommand('esp32-halloween3.local', 'off', 'status3')">Off</button>
+      <button onclick="sendCommand('esp32-halloween3.local', 'on', 'status3')">Test On</button>
+      <button onclick="sendCommand('esp32-halloween3.local', 'off', 'status3')">Test Off</button>
     </div>
     <span class="status" id="status3"></span>
   </div>
